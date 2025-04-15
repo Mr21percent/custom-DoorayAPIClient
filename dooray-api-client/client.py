@@ -323,3 +323,211 @@ class DoorayAPIClient:
         data = {"type": file_type}
         headers = {"Authorization": f"dooray-api {self.token}"}
         return self._post_file_with_redirect(url, params={}, file_field="file", file_path=file_path, data=data, extra_headers=headers)
+
+# 여기서부터는 작동 여부 모름 ===========================================================================
+# ==================== 프로젝트 API ====================
+def create_project(self, code: str, description: str, scope: str = "private"):
+        """
+        프로젝트 생성
+        """
+        endpoint = "/project/v1/projects"
+        json_data = {
+            "code": code,
+            "description": description,
+            "scope": scope
+        }
+        return self._request("POST", endpoint, json_data=json_data)
+
+    def get_projects(self, member: str = "me", page: int = 0, size: int = 20, type: str = "public", scope: str = "private", state: str = "active"):
+        """
+        접근 가능한 프로젝트 목록 조회
+        """
+        endpoint = "/project/v1/projects"
+        params = {
+            "member": member,
+            "page": page,
+            "size": size,
+            "type": type,
+            "scope": scope,
+            "state": state
+        }
+        return self._request("GET", endpoint, params=params)
+
+    def get_project(self, project_id: str):
+        """
+        프로젝트 정보 조회
+        """
+        endpoint = f"/project/v1/projects/{project_id}"
+        return self._request("GET", endpoint)
+
+    def is_project_creatable(self, code: str):
+        """
+        프로젝트 생성 가능 여부 확인
+        """
+        endpoint = "/project/v1/projects/is-creatable"
+        json_data = {
+            "code": code
+        }
+        return self._request("POST", endpoint, json_data=json_data)
+
+    # ==================== 프로젝트 업무 상태 API ====================
+    
+    def get_workflows(self, project_id: str):
+        """
+        프로젝트의 업무 상태 조회
+        """
+        endpoint = f"/project/v1/projects/{project_id}/workflows"
+        return self._request("GET", endpoint)
+
+    def add_workflow(self, project_id: str, name: str, order: int, names: list, class_type: str):
+        """
+        프로젝트에 업무 상태 추가
+        """
+        endpoint = f"/project/v1/projects/{project_id}/workflows"
+        json_data = {
+            "name": name,
+            "order": order,
+            "names": names,
+            "class": class_type
+        }
+        return self._request("POST", endpoint, json_data=json_data)
+
+    def update_workflow(self, project_id: str, workflow_id: str, name: str, order: int, names: list, class_type: str):
+        """
+        프로젝트의 업무 상태 수정
+        """
+        endpoint = f"/project/v1/projects/{project_id}/workflows/{workflow_id}"
+        json_data = {
+            "name": name,
+            "order": order,
+            "names": names,
+            "class": class_type
+        }
+        return self._request("PUT", endpoint, json_data=json_data)
+
+    def delete_workflow(self, project_id: str, workflow_id: str, to_be_workflow_id: str):
+        """
+        프로젝트의 업무 상태 삭제
+        """
+        endpoint = f"/project/v1/projects/{project_id}/workflows/{workflow_id}/delete"
+        json_data = {
+            "toBeWorkflowId": to_be_workflow_id
+        }
+        return self._request("POST", endpoint, json_data=json_data)
+
+    # ==================== 프로젝트 이메일 API ====================
+    
+    def create_email_address(self, project_id: str, email_address: str, name: str):
+        """
+        프로젝트 하위에 이메일 주소 생성
+        """
+        endpoint = f"/project/v1/projects/{project_id}/email-addresses"
+        json_data = {
+            "emailAddress": email_address,
+            "name": name
+        }
+        return self._request("POST", endpoint, json_data=json_data)
+
+    def get_email_address(self, project_id: str, email_address_id: str):
+        """
+        프로젝트의 이메일 정보 조회
+        """
+        endpoint = f"/project/v1/projects/{project_id}/email-addresses/{email_address_id}"
+        return self._request("GET", endpoint)
+
+    # ==================== 프로젝트 태그 API ====================
+    
+    def create_tag(self, project_id: str, name: str, color: str):
+        """
+        프로젝트에 태그 생성
+        """
+        endpoint = f"/project/v1/projects/{project_id}/tags"
+        json_data = {
+            "name": name,
+            "color": color
+        }
+        return self._request("POST", endpoint, json_data=json_data)
+
+    def get_tags(self, project_id: str, page: int = 0, size: int = 20):
+        """
+        프로젝트 태그 목록 조회
+        """
+        endpoint = f"/project/v1/projects/{project_id}/tags"
+        params = {
+            "page": page,
+            "size": size
+        }
+        return self._request("GET", endpoint, params=params)
+
+    def get_tag(self, project_id: str, tag_id: str):
+        """
+        프로젝트의 특정 태그 조회
+        """
+        endpoint = f"/project/v1/projects/{project_id}/tags/{tag_id}"
+        return self._request("GET", endpoint)
+
+    # ==================== 프로젝트 마일스톤 API ====================
+    
+    def create_milestone(self, project_id: str, name: str, started_at: str, ended_at: str):
+        """
+        프로젝트 마일스톤 생성
+        """
+        endpoint = f"/project/v1/projects/{project_id}/milestones"
+        json_data = {
+            "name": name,
+            "startedAt": started_at,
+            "endedAt": ended_at
+        }
+        return self._request("POST", endpoint, json_data=json_data)
+
+    def get_milestones(self, project_id: str, page: int = 0, size: int = 20, status: str = "open"):
+        """
+        프로젝트 마일스톤 목록 조회
+        """
+        endpoint = f"/project/v1/projects/{project_id}/milestones"
+        params = {
+            "page": page,
+            "size": size,
+            "status": status
+        }
+        return self._request("GET", endpoint, params=params)
+
+    def get_milestone(self, project_id: str, milestone_id: str):
+        """
+        특정 프로젝트 마일스톤 조회
+        """
+        endpoint = f"/project/v1/projects/{project_id}/milestones/{milestone_id}"
+        return self._request("GET", endpoint)
+
+    def update_milestone(self, project_id: str, milestone_id: str, name: str, status: str, started_at: str, ended_at: str):
+        """
+        프로젝트 마일스톤 수정
+        """
+        endpoint = f"/project/v1/projects/{project_id}/milestones/{milestone_id}"
+        json_data = {
+            "name": name,
+            "status": status,
+            "startedAt": started_at,
+            "endedAt": ended_at
+        }
+        return self._request("PUT", endpoint, json_data=json_data)
+
+    def delete_milestone(self, project_id: str, milestone_id: str):
+        """
+        프로젝트 마일스톤 삭제
+        """
+        endpoint = f"/project/v1/projects/{project_id}/milestones/{milestone_id}"
+        return self._request("DELETE", endpoint)
+
+    # ==================== 프로젝트 Hook API ====================
+    
+    def create_hook(self, project_id: str, url: str, send_events: list):
+        """
+        프로젝트 Hook 생성
+        """
+        endpoint = f"/project/v1/projects/{project_id}/hooks"
+        json_data = {
+            "url": url,
+            "sendEvents": send_events
+        }
+        return self._request("POST", endpoint, json_data=json_data)
